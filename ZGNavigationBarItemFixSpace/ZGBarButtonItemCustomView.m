@@ -10,8 +10,6 @@
 #import "UIView+ZGLayoutConstraint.h"
 #import "ZGNavBarItemSpceMacro.h"
 #import "NSObject+ZGRuntime.h"
-#import "Aspects.h"
-#import <KVOController/KVOController.h>
 
 @interface ZGBarButtonItemCustomView ()
 
@@ -66,7 +64,6 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.barView = [self p_getBarViewFromView:self];
-    [self p_setButtonTitleFollowBarViewTintColor];
 }
 
 #pragma mark - actions
@@ -88,6 +85,7 @@
 - (void)p_setUpButtonWithTitle:(NSString *)title image:(UIImage *)image target:(id)target action:(SEL)action {
     [self addSubview:self.button];
     [self.button setTitle:title forState:UIControlStateNormal];
+    [self.button setTitleColor:[UIColor mainColor] forState:UIControlStateNormal];
     [self.button.titleLabel setFont:ZG_BAR_ITEM_FONT];
     if (image.renderingMode == UIImageRenderingModeAutomatic) {
         image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
@@ -111,32 +109,16 @@
     return tempView;
 }
 
-- (void)p_setButtonTitleFollowBarViewTintColor {
-    if (self.itemType == ZGBarButtonItemTypeTitle) {
-        [self.button setTitleColor:self.barView.tintColor forState:UIControlStateNormal];
-        
-        if ([self.barView isKindOfClass:UINavigationBar.class]) {
-            __weak typeof(self) weakSelf = self;
-            [self.KVOController observe:self.barView
-                                keyPath:@"tintColor"
-                                options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                                  block:^(id  _Nullable observer, id  _Nonnull object, NSDictionary<NSString *,id> * _Nonnull change) {
-                                      [weakSelf.button setTitleColor:weakSelf.barView.tintColor forState:UIControlStateNormal];
-                                  }];
-        }
-    }
-}
-
 #pragma mark - setter & getter
 - (void)setPosition:(ZGBarButtonItemPosition)position {
     _position = position;
     
     if (self.position == ZGBarButtonItemPositionLeft) {
-        [self.button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
-        self.customView.center = CGPointMake(self.customView.frame.size.width/2, self.customView.center.y);
+        [self.button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
+//        self.customView.center = CGPointMake(self.customView.frame.size.width/2, self.customView.center.y);
     } else {
-        [self.button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
-        self.customView.center = CGPointMake(self.frame.size.width-self.customView.frame.size.width/2, self.customView.center.y);
+        [self.button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
+//        self.customView.center = CGPointMake(self.frame.size.width-self.customView.frame.size.width/2, self.customView.center.y);
     }
 }
 
@@ -175,7 +157,14 @@
         self.layoutMargins = UIEdgeInsetsZero;
         for (UIView *subView in self.subviews) {
             if ([subView isKindOfClass:NSClassFromString(@"_UINavigationBarContentView")]) {
-                subView.layoutMargins = UIEdgeInsetsMake(0, 4, 0, 10);
+                if (@available(iOS 13.0, *)) {
+//                    CGRect frame = subView.frame;
+//                    frame.origin.x -= 10;
+//                    frame.size.width += 20;
+//                    subView.frame = frame;
+                } else {
+                    subView.layoutMargins = UIEdgeInsetsMake(0, 10, 0, 10);
+                }
                 break;
             }
         }

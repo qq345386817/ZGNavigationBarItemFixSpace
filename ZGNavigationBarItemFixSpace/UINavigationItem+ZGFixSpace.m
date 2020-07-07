@@ -46,11 +46,7 @@
     
     NSMutableArray *items = [NSMutableArray array];
     if ([[[UIDevice currentDevice] systemVersion] floatValue] < 11) {
-        ZGBarButtonItemCustomView *customView = (ZGBarButtonItemCustomView *)((UIBarButtonItem *)[leftBarButtonItems firstObject]).customView;
         CGFloat gap = ZG_BAR_ITEM_SCREEN_BORDER_GAP;
-        if (customView.itemType == ZGBarButtonItemTypeImage) {
-            gap -= ZG_BAR_ITEM_LEFT_ICON_EDGE_INSETS;
-        }
         [items addObject:[UIBarButtonItem zg_fixedSpaceWithWidth:-(15 - gap)]];
     }
     ZGBarButtonItemCustomView *prevCustomeView = nil;
